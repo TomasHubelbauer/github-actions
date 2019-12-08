@@ -1,5 +1,30 @@
 # GitHub Actions
 
+## Read Workflow
+
+This workflow script proceeds to validate the repository without pushing any
+artifacts to it.
+
+```yml
+name: github-actions
+on:
+  push:
+    branches:
+    # Limit to the `master` branch
+    - master
+jobs:
+  github-actions:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Run the workflow
+      run: |
+        set -x
+        # Run the script
+        npm install
+        npm start
+```
+
 ## To-Do
 
 ### Learn about caching and demonstrate it
