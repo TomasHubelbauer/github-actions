@@ -81,13 +81,20 @@ on:
     - cron:  '0 0 * * *'
 ```
 
+
+**Scheduled runs do not have access to the cache.**
+
+## Cache
+
+It is possible to cache things across workflow runs:
+
 Change the Cron to `0 * * * *` to run hourly.
 
-## To-Do
-
-### Learn about caching and demonstrate it
-
 https://help.github.com/en/actions/automating-your-workflow-with-github-actions/caching-dependencies-to-speed-up-workflows
+
+However, scheduled runs do not have access to the cache.
+
+## To-Do
 
 ### Learn about artifacts and demonstrate them
 
