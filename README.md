@@ -84,6 +84,21 @@ on:
 
 **Scheduled runs do not have access to the cache.**
 
+## Email Notifications
+
+There is no built in way to send email notifications from the workflow runs.
+One has to code that up themselves. I've wrapped the implementation in a repo:
+
+**To be able to clone the repo, one has to use a custom PAT, since it is private.**
+
+```yml
+# Send myself an email
+git clone https://TomasHubelbauer:${{secrets.GITHUB_ACTIONS_PAT}}@github.com/TomasHubelbauer/self-email.git
+chmod +x ./self-email/self-email.sh
+echo "Hi." >> email.eml
+cat email.eml | ./self-email/self-email.sh
+```
+
 ## Cache
 
 It is possible to cache things across workflow runs:
