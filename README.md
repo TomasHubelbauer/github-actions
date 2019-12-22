@@ -116,3 +116,7 @@ However, scheduled runs do not have access to the cache.
 https://help.github.com/en/actions/automating-your-workflow-with-github-actions/persisting-workflow-data-using-artifacts
 
 ### Go through the docs and document interesting features
+
+### See if the workflow files can be simplifed like with Azure Pipelines
+
+Go directly to the steps element and see if that works.
