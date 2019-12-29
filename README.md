@@ -71,7 +71,7 @@ jobs:
         git push
 ```
 
-## GitHub Pages Deployment
+## GitHub Pages Deployment Workflow
 
 This GitHub Actions workflow builds a CRA application placed in a `cra` directory
 and places the result into a `docs` directory from which GitHub Pages are hosted.
@@ -114,7 +114,8 @@ jobs:
         npm install
         npm run build
         # Move the `build` directory to be the `docs` directory for GitHub Pages
-        mv build ../docs
+        cd ..
+        mv cra/build docs
         # Stage the generated GitHub Pages directory
         git add docs
         # Reset unstaged changes if there are any outside of `docs` to prevent commit failure
