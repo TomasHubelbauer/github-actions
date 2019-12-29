@@ -1,5 +1,10 @@
 # GitHub Actions
 
+## Status Badge
+
+See [github-actions-badge](https://github.com/TomasHubelbauer/github-actions-badge)
+for GitHub Actions workflow status image badge MarkDown link syntax.
+
 ## Read Workflow
 
 This workflow script proceeds to validate the repository without pushing any
