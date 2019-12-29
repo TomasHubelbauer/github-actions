@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Run the scraper
+    - name: Run the workflow
       run: |
         set -x
         # Configure Git for the push from the workflow to the repository
