@@ -1,5 +1,7 @@
 # GitHub Actions
 
+[**WEB**](https://tomashubelbauer.github.io/github-actions)
+
 ## Status Badge
 
 See [github-actions-badge](https://github.com/TomasHubelbauer/github-actions-badge)
