@@ -72,7 +72,7 @@ jobs:
         git commit -m "Commit changes from the workflow"
         # Rebase if the branch has meanwhile changed (fail if there are automatically irresolvable merge conflicts)
         git pull --rebase
-        # Pus the commit to the repository associated with this workflow
+        # Push the commit to the repository associated with this workflow
         git push
 ```
 
