@@ -65,7 +65,10 @@ jobs:
         git add output/*
         # Reset unstaged changes to prevent `git commit` from yelling if there's e.g. `package-lock.json` or caches
         git checkout -- .
-        # Commit the added changes to the repository associated with this workflow
+        # Commit the added changes to the repository associated with this workflow (if any)
+        if git diff-index --quiet HEAD --; then
+          exit
+        fi
         git commit -m "Commit changes from the workflow"
         # Rebase if the branch has meanwhile changed (fail if there are automatically irresolvable merge conflicts)
         git pull --rebase
