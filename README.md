@@ -51,6 +51,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Run the workflow
       run: |
+        set -e
         set -x
         # Configure Git for the push from the workflow to the repository
         git config --global user.email "tomas@hubelbauer.net"
@@ -106,6 +107,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Generate GitHub Pages
       run: |
+        set -e
         set -x
         # Configure Git identity for the push from the workflow to the repository
         git config --global user.email "tomas@hubelbauer.net"
