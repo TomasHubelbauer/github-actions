@@ -81,14 +81,32 @@ jobs:
         fi
         
         # Commit the staged changes to the workflow repository
-        git commit -m "Generate GitHub Pages"
+        git commit -m "Commit generated content"
         
         # Rebase if the branch has changed meanwhile or fail on automatically irresolvable conflicts
         git pull --rebase
         
         # Push the commit to the workflow repository 
         git push
-        
+```
+
+## GitHub Pages Deployment Workflow
+
+This GitHub Actions workflow builds on top of the write one above. GitHub Pages
+can be hosted either from the root of the repository or the `docs` folder, so the
+above workflow needs to be updated to write the contents the GitHub Pages should
+have to the right directory first.
+
+It requires a custom PAT to invoke the GitHub API and deploy the GitHub Pages,
+because the integration PAT doesn't cause GitHub Pages to build on push and using
+the custom PAT to push would cause an infinite GitHub Actions chain on the push.
+
+In case of CRA, it is imporant to set the `homepage` field of the CRA `package.json`
+so that the built site has correct relative URLs since it is going to be hosted on
+a path relative to the GitHub Pages domain unless a custom domain is configured.
+
+```yml
+        … the workflow script so far …
 
         # Enqueue and monitor a GitHub Pages deployment using the GitHub API and the custom PAT
         # (The out-of-the-box PAT is an integration PAT - not privileged to make GitHub Pages API calls)
@@ -123,72 +141,6 @@ jobs:
             exit
           fi
         done
-```
-
-## GitHub Pages Deployment Workflow
-
-This GitHub Actions workflow builds a CRA application placed in a `cra` directory
-and places the result into a `docs` directory from which GitHub Pages are hosted.
-
-It requires a custom PAT to invoke the GitHub API and deploy the GitHub Pages,
-because the integration PAT doesn't cause GitHub Pages to build on push and using
-the custom PAT to push would cause an infinite GitHub Actions chain on the push.
-
-It is imporant to set the `homepage` field of the CRA `package.json` so that the
-built site has correct relative URLs since it is going to be hosted on a path
-relative to the GitHub Pages domain.
-
-```yml
-name: cd
-on:
-  push:
-    branches:
-    # Limit to the `master` branch
-    - master
-  schedule:
-    # Run hourly
-    - cron:  '0 * * * *'
-jobs:
-  cd:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - name: Generate GitHub Pages
-      run: |
-        set -e
-        set -x
-        # Configure Git identity for the push from the workflow to the repository
-        git config --global user.email "tomas@hubelbauer.net"
-        git config --global user.name "Tomas Hubelbauer"
-        # Check out `master` - by default GitHub Actions checks out detached HEAD
-        git checkout master
-        # Delete the existing `docs` directory as it will be re-generated
-        rm -rf docs
-        # Build the Create React App application for the GitHub Pages deployment
-        cd cra
-        npm install
-        npm run build
-        # Move the `build` directory to be the `docs` directory for GitHub Pages
-        cd ..
-        mv cra/build docs
-        # Stage the generated GitHub Pages directory
-        git add docs
-        # Reset unstaged changes if there are any outside of `docs` to prevent commit failure
-        git checkout -- .
-        # Exit if there are no new changes (due to scheduled run or non-code changes)
-        if git diff-index --quiet HEAD --; then
-          exit
-        fi
-        # Commit the changes to the Git repository to deploy to GitHub Pages
-        git commit -m "Deploy to GitHub Pages"
-        # Authenticate with GitHub using the default integration PAT (this one won't deploy GitHub Pages)
-        git remote set-url origin https://tomashubelbauer:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}
-        # Rebase before pushing to integrate fast forward changes if there are any
-        git pull --rebase
-        # Push the changes to GitHub where it will not deploy GitHub Pages due to the use of the integration PAT
-        git push
-        # Enqueue a GitHub Pages deployment using the API with the custom PAT (the integration PAT cannot call the API)
-        curl -f -X POST -H "Authorization: token ${{secrets.GITHUB_PAGES_PAT}}" -H "Accept: application/vnd.github.mister-fantastic-preview+json" "https://api.github.com/repos/${{github.repository}}/pages/builds"
 ```
 
 ## Scheduled Runs
