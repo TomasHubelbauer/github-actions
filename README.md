@@ -53,28 +53,76 @@ jobs:
       run: |
         set -e
         set -x
+        
         # Configure Git for the push from the workflow to the repository
         git config --global user.email "tomas@hubelbauer.net"
         git config --global user.name "Tomas Hubelbauer"
-        # Check out the `master` branch because by default GitHub Actions checks out detached HEAD
+        
+        # Check out the `master` branch - GitHub Actions checks out detached HEAD
         git checkout master
-        # Run the command
-        ./command.sh
-        # Authenticate with GitHub using the out of the box workflow integration PAT
+        
+        # Run the CI script
+        ./script.sh
+        
+        # Authenticate with GitHub using the out-of-the-box workflow PAT
+        # (The commit using this PAT for authentication won't build GitHub Pages)
+        # (The commit using the custom PAT would built GitHub Pages but also start an infinite GitHub Actions workflow loop)
         git remote set-url origin https://tomashubelbauer:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}
-        # Add the command output to the commit
-        git add output/*
-        # Reset unstaged changes to prevent `git commit` from yelling if there's e.g. `package-lock.json` or caches
+        
+        # Stage the Git index changes resulting from the CI script
+        git add *
+        
+        # Reset unstaged changes so that Git commit won't fail (e.g.: package-lock.json, temporary files, …)
         git checkout -- .
-        # Commit the added changes to the repository associated with this workflow (if any)
+        
+        # Bail if there are no changes to commit and hence no GitHub Pages to build
         if git diff-index --quiet HEAD --; then
           exit
         fi
-        git commit -m "Commit changes from the workflow"
-        # Rebase if the branch has meanwhile changed (fail if there are automatically irresolvable merge conflicts)
+        
+        # Commit the staged changes to the workflow repository
+        git commit -m "Generate GitHub Pages"
+        
+        # Rebase if the branch has changed meanwhile or fail on automatically irresolvable conflicts
         git pull --rebase
-        # Push the commit to the repository associated with this workflow
+        
+        # Push the commit to the workflow repository 
         git push
+        
+
+        # Enqueue and monitor a GitHub Pages deployment using the GitHub API and the custom PAT
+        # (The out-of-the-box PAT is an integration PAT - not privileged to make GitHub Pages API calls)
+        
+        # Authorize using the custom PAT which is privileged to call the GitHub Pages API
+        authorization="Authorization: token ${{secrets.GITHUB_PAGES_PAT}}"
+        
+        pagesBuildsUrl="https://api.github.com/repos/${{github.repository}}/pages/builds"
+        pagesBuildsJson="pages-builds.json"
+
+        curl -s -f -X POST -H "$authorization" $pagesBuildsUrl > $pagesBuildsJson
+        status=$(jq '.status' $pagesBuildsJson | tr -d '"')
+        echo $status
+        if [ "$status" != "queued" ]
+        then
+          exit 1
+        fi
+
+        pagesBuildsLatestUrl=$(jq '.url' $pagesBuildsJson | tr -d '"')
+        pagesBuildsLatestJson="pages-builds-latest.json"
+
+        rm $pagesBuildsJson
+        while true
+        do
+          sleep 5
+          curl -s -f -H "$authorization" $pagesBuildsLatestUrl > $pagesBuildsLatestJson
+          status=$(jq '.status' $pagesBuildsLatestJson | tr -d '"')
+          echo $status
+          if [ "$status" = "built" ]
+          then
+            rm $pagesBuildsLatestJson
+            exit
+          fi
+        done
 ```
 
 ## GitHub Pages Deployment Workflow
