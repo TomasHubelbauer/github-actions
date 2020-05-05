@@ -90,6 +90,53 @@ jobs:
         git push
 ```
 
+This can also be expressed using individual `step` objects in the workflow file.
+I usually like to avoid platform lock-in and not buy into proprietary tech, that's
+why the first choice here is just and embedded and nicely copyable Bash script, but
+in case the workflow file is only for GitHub and there are other means of deployment
+not dependent on its contents, it is possible to take advantage of the `step` fields
+of the workflow file and benefit from the nice UI GitHub Actions provides if you do
+buy in. It is a little cumbersome to express the condition where the job exits early
+if there are no changes to commit, so this workflow does not have it, but it is likely
+possible to do it so that other steps are skipped. I just haven't done it, yet.
+
+```yml
+name: github-actions
+on:
+  push:
+    branches:
+    # Limit to the `master` branch
+    - master
+jobs:
+  github-actions:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Configure Git for the push from the workflow to the repository
+      run: |
+        git config --global user.email "tomas@hubelbauer.net"
+        git config --global user.name "Tomas Hubelbauer"
+    - name: Check out the `master` branch - GitHub Actions checks out detached HEAD
+      run: git checkout master
+    - name: Run the workflow script
+      run: ./script.sh
+    - name: Authenticate with GitHub using the out-of-the-box workflow PAT
+      run: |
+        # (The commit using this PAT for authentication won't build GitHub Pages)
+        # (The commit using the custom PAT would built GitHub Pages but also start an infinite GitHub Actions workflow loop)
+        git remote set-url origin https://tomashubelbauer:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}
+    - name: Stage the Git index changes resulting from the CI script
+      run: git add *
+    - name: Reset unstaged changes so that Git commit won't fail (e.g. package-lock.json, temporary files, …)
+      run: git checkout -- .
+    - name: Commit the staged changes to the workflow repository
+      run: git commit -m "Commit generated content"
+    - name: Rebase if the branch has changed meanwhile or fail on automatically irresolvable conflicts
+      run: git pull --rebase
+    - name: Push the commit to the workflow repository
+      run: git push
+```
+
 ## GitHub Pages Deployment Workflow
 
 This GitHub Actions workflow builds on top of the write one above. GitHub Pages
