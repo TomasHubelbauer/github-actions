@@ -7,6 +7,10 @@
 See [github-actions-badge](https://github.com/TomasHubelbauer/github-actions-badge)
 for GitHub Actions workflow status image badge MarkDown link syntax.
 
+## Workflow File Location
+
+`.github/workflows/$name.yml` - the `$name` can be whatever you like.
+
 ## Read Workflow
 
 This workflow script proceeds to validate the repository without pushing any
