@@ -202,9 +202,17 @@ Add this to make the workflow run daily:
 ```yml
 on:
   push:
+  schedule:
+    - cron: "0 0 * * *"
+```
+
+Change to this to limit to the main branch:
+
+```yml
+on:
+  push:
     branches:
-    # Limit to the `master` branch
-    - master
+    - main
   schedule:
     # Run daily
     - cron:  '0 0 * * *'
