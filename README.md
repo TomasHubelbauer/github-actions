@@ -27,7 +27,7 @@ jobs:
   github-actions:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - name: Run the workflow
       run: |
         set -x
@@ -52,7 +52,7 @@ jobs:
   github-actions:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - name: Run the workflow
       run: |
         set -e
@@ -116,7 +116,7 @@ jobs:
   github-actions:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - name: Configure Git for the push from the workflow to the repository
       run: |
         git config --global user.email "tomas@hubelbauer.net"
