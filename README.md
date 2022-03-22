@@ -21,8 +21,8 @@ name: github-actions
 on:
   push:
     branches:
-    # Limit to the `master` branch
-    - master
+    # Limit to the `main` branch
+    - main
 jobs:
   github-actions:
     runs-on: ubuntu-latest
@@ -46,8 +46,8 @@ name: github-actions
 on:
   push:
     branches:
-    # Limit to the `master` branch
-    - master
+    # Limit to the `main` branch
+    - main
 jobs:
   github-actions:
     runs-on: ubuntu-latest
@@ -62,8 +62,8 @@ jobs:
         git config --global user.email "tomas@hubelbauer.net"
         git config --global user.name "Tomas Hubelbauer"
         
-        # Check out the `master` branch - GitHub Actions checks out detached HEAD
-        git checkout master
+        # Check out the `main` branch - GitHub Actions checks out detached HEAD
+        git checkout main
         
         # Run the CI script
         ./script.sh
@@ -110,8 +110,8 @@ name: github-actions
 on:
   push:
     branches:
-    # Limit to the `master` branch
-    - master
+    # Limit to the `main` branch
+    - main
 jobs:
   github-actions:
     runs-on: ubuntu-latest
@@ -121,8 +121,8 @@ jobs:
       run: |
         git config --global user.email "tomas@hubelbauer.net"
         git config --global user.name "Tomas Hubelbauer"
-    - name: Check out the `master` branch - GitHub Actions checks out detached HEAD
-      run: git checkout master
+    - name: Check out the `main` branch - GitHub Actions checks out detached HEAD
+      run: git checkout main
     - name: Run the workflow script
       run: ./script.sh
     - name: Authenticate with GitHub using the out-of-the-box workflow PAT
