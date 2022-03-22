@@ -96,51 +96,70 @@ jobs:
         git push
 ```
 
-This can also be expressed using individual `step` objects in the workflow file.
-I usually like to avoid platform lock-in and not buy into proprietary tech, that's
-why the first choice here is just and embedded and nicely copyable Bash script, but
-in case the workflow file is only for GitHub and there are other means of deployment
-not dependent on its contents, it is possible to take advantage of the `step` fields
-of the workflow file and benefit from the nice UI GitHub Actions provides if you do
-buy in. It is a little cumbersome to express the condition where the job exits early
-if there are no changes to commit, so this workflow does not have it, but it is likely
-possible to do it so that other steps are skipped. I just haven't done it, yet.
+An alternative way to do this is to buy in to the proprietary GitHub Actions
+syntax and get the benefit of the nicer UI. I would only do this for simple
+scripts that are easy to convert back to Bash with just copy-paste if needed.
 
 ```yml
 name: github-actions
 on:
   push:
-    branches:
-    # Limit to the `main` branch
-    - main
+  schedule:
+    - cron: "0 0 * * *"
 jobs:
   github-actions:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Configure Git for the push from the workflow to the repository
-      run: |
-        git config --global user.email "tomas@hubelbauer.net"
-        git config --global user.name "Tomas Hubelbauer"
-    - name: Check out the `main` branch - GitHub Actions checks out detached HEAD
-      run: git checkout main
-    - name: Run the workflow script
-      run: ./script.sh
-    - name: Authenticate with GitHub using the out-of-the-box workflow PAT
-      run: |
-        # (The commit using this PAT for authentication won't build GitHub Pages)
-        # (The commit using the custom PAT would built GitHub Pages but also start an infinite GitHub Actions workflow loop)
-        git remote set-url origin https://tomashubelbauer:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}
-    - name: Stage the Git index changes resulting from the CI script
-      run: git add *
-    - name: Reset unstaged changes so that Git commit won't fail (e.g. package-lock.json, temporary files, …)
-      run: git checkout -- .
-    - name: Commit the staged changes to the workflow repository
-      run: git commit -m "Commit generated content"
-    - name: Rebase if the branch has changed meanwhile or fail on automatically irresolvable conflicts
-      run: git pull --rebase
-    - name: Push the commit to the workflow repository
-      run: git push
+      # We need to check out first so that we have a baseline to make a diff of
+      - name: Check out the existing scaffolded source code to make the change against
+        uses: actions/checkout@v3
+
+      # Set up Git baseline branch and identity before making any changes
+      - name: Commit and push the change to the GitHub repository from the agent
+        run: |
+          # Configure Git for the push from the workflow to the repository
+          # (This is needed even with the workflow PAT)
+          git config --global user.email "tomas@hubelbauer.net"
+          git config --global user.name "Tomas Hubelbauer"
+
+          # Check out the `main` branch - GitHub Actions checks out detached HEAD
+          git checkout main
+
+      # Carry out the workflow work
+      - name: Run the workflow script or do some other stuff in more steps
+        run: ./script.sh
+
+      # This PAT is provided by the GitHub Actions runtime and is good for
+      # everything but it will not cause GitHub Pages to deploy when pushed with
+      # Use a custom PAT in repository secrets and push with that one or call
+      # the GitHub Pages REST API to trigger a deployment manually
+      - name: Authenticate with GitHub using the out of the box PAT
+        run: git remote set-url origin https://tomashubelbauer:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}
+
+      - name: Stage the changes resulting from the above steps
+        run: git add *
+
+      - name: Bail if there are no changes staged to commit
+        id: bail
+        continue-on-error: true
+        run: |
+          git status
+          if git diff-index --quiet HEAD --; then
+            echo "::set-output name=bail::true"
+          else
+            echo "::set-output name=bail::false"
+          fi
+
+      - name: Commit the staged changes to the workflow repository
+        if: ${{ steps.bail.outputs.bail == 'false' }}
+        run: git commit -m "Capture workflow changes"
+
+      - name: Rebase if the branch has changed meanwhile or fail on conflicts
+        if: ${{ steps.bail.outputs.bail == 'false' }}
+        run: git pull --rebase
+
+      - name: Push the commit to the workflow repository
+        run: git push
 ```
 
 ## GitHub Pages Deployment Workflow
