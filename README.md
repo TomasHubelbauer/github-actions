@@ -70,7 +70,7 @@ jobs:
         
         # Authenticate with GitHub using the out-of-the-box workflow PAT
         # (The commit using this PAT for authentication won't build GitHub Pages)
-        # (The commit using the custom PAT would built GitHub Pages but also start an infinite GitHub Actions workflow loop)
+        # (The commit using the custom PAT would build GitHub Pages but also start an infinite GitHub Actions workflow loop)
         git remote set-url origin https://tomashubelbauer:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}
         
         # Stage the Git index changes resulting from the CI script
