@@ -91,7 +91,8 @@ jobs:
         # Rebase if the branch has changed meanwhile or fail on automatically irresolvable conflicts
         git pull --rebase
         
-        # Push the commit to the workflow repository 
+        # Push the commit to the workflow repository
+        # This will not cause an infinite loop, GitHub knows it is from the agent and will not run the workflow again
         git push
 ```
 
