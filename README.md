@@ -69,8 +69,9 @@ jobs:
         ./script.sh
         
         # Authenticate with GitHub using the out-of-the-box workflow PAT
-        # (The commit using this PAT for authentication won't build GitHub Pages)
-        # (The commit using the custom PAT would build GitHub Pages but also start an infinite GitHub Actions workflow loop)
+        # This PAT won't build GitHub Pages when used!
+        # A custom PAT would build GitHub Pages but needs `[no ci]` to avoid infinite loop:
+        # https://github.blog/changelog/2021-02-08-github-actions-skip-pull-request-and-push-workflows-with-skip-ci
         git remote set-url origin https://tomashubelbauer:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}
         
         # Stage the Git index changes resulting from the CI script
