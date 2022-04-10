@@ -42,8 +42,8 @@ jobs:
 
 ## Write Workflow
 
-Note that when creating a single file, it is easier to use the GitHub Contents
-API which can be used with the workflow integration PAT:
+**Note:** Writing back to the repository is also possible with REST (sole file)
+and GraphQL (multiple files). Prefer this for new integrations!
 
 https://github.com/TomasHubelbauer/github-actions-push-api
 
