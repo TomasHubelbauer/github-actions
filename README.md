@@ -81,7 +81,7 @@ jobs:
         # This PAT won't build GitHub Pages when used!
         # A custom PAT would build GitHub Pages but needs `[no ci]` to avoid infinite loop:
         # https://github.blog/changelog/2021-02-08-github-actions-skip-pull-request-and-push-workflows-with-skip-ci
-        git remote set-url origin https://tomashubelbauer:${{github.token}}@github.com/${{github.repository}}
+        git remote set-url origin https://${{github.repository_owner}}:${{github.token}}@github.com/${{github.repository}}
         
         # Stage the Git index changes resulting from the CI script
         git add *
@@ -143,7 +143,7 @@ jobs:
       # Use a custom PAT in repository secrets and push with that one or call
       # the GitHub Pages REST API to trigger a deployment manually
       - name: Authenticate with GitHub using the out of the box PAT
-        run: git remote set-url origin https://tomashubelbauer:${{github.token}}@github.com/${{github.repository}}
+        run: git remote set-url origin https://${{github.repository_owner}}:${{github.token}}@github.com/${{github.repository}}
 
       - name: Stage the changes resulting from the above steps
         run: git add *
