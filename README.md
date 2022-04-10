@@ -38,6 +38,11 @@ jobs:
 
 ## Write Workflow
 
+Note that when creating a single file, it is easier to use the GitHub Contents
+API which can be used with the workflow integration PAT:
+
+https://github.com/TomasHubelbauer/github-actions-push-api
+
 This workflow scripts executes a command and then commits its outputs to the
 repository associated with the workflow.
 
