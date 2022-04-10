@@ -275,6 +275,11 @@ https://help.github.com/en/actions/automating-your-workflow-with-github-actions/
 
 However, scheduled runs do not have access to the cache.
 
+## Notes
+
+Unlike Azure Pipelines at which GitHub Actions are based on, the `steps` object
+is required in GitHub Actions and cannot be skipped to go straight to the step.
+
 ## To-Do
 
 ### Learn about artifacts and demonstrate them
@@ -283,6 +288,9 @@ https://help.github.com/en/actions/automating-your-workflow-with-github-actions/
 
 ### Go through the docs and document interesting features
 
-### See if the workflow files can be simplifed like with Azure Pipelines
+### Replace the Write Workflow section with a link to the experimental repo
 
-Go directly to the steps element and see if that works.
+https://github.com/TomasHubelbauer/github-actions-push-api
+
+All of the new write workflows should be based on this and the old ones changed
+to this.
