@@ -11,6 +11,10 @@ for GitHub Actions workflow status image badge MarkDown link syntax.
 
 `.github/workflows/$name.yml` - the `$name` can be whatever you like.
 
+## Manual Runs
+
+https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow
+
 ## Read Workflow
 
 This workflow script proceeds to validate the repository without pushing any
