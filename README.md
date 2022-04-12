@@ -162,14 +162,15 @@ jobs:
           fi
 
       - name: Commit the staged changes to the workflow repository
-        if: ${{ steps.bail.outputs.bail == 'false' }}
+        if: ${{steps.bail.outputs.bail == 'false'}}
         run: git commit -m "Capture workflow changes"
 
       - name: Rebase if the branch has changed meanwhile or fail on conflicts
-        if: ${{ steps.bail.outputs.bail == 'false' }}
+        if: ${{steps.bail.outputs.bail == 'false'}}
         run: git pull --rebase
 
       - name: Push the commit to the workflow repository
+        if: ${{steps.bail.outputs.bail == 'false'}}
         run: git push
 ```
 
