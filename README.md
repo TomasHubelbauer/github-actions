@@ -68,8 +68,9 @@ jobs:
         set -x
         
         # Configure Git for the push from the workflow to the repository
-        git config --global user.email "tomas@hubelbauer.net"
-        git config --global user.name "Tomas Hubelbauer"
+        # These credentials will make the commit associate with the GitHub Actions service account
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
         
         # Check out the `main` branch - GitHub Actions checks out detached HEAD
         git checkout main
@@ -128,8 +129,9 @@ jobs:
         run: |
           # Configure Git for the push from the workflow to the repository
           # (This is needed even with the workflow PAT)
-          git config --global user.email "tomas@hubelbauer.net"
-          git config --global user.name "Tomas Hubelbauer"
+          # These credentials will make the commit associate with the GitHub Actions service account
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
 
           # Check out the `main` branch - GitHub Actions checks out detached HEAD
           git checkout main
