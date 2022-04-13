@@ -21,23 +21,25 @@ This workflow script proceeds to validate the repository without pushing any
 artifacts to it.
 
 ```yml
-name: github-actions
-on:
-  push:
-    branches:
-    # Limit to the `main` branch
-    - main
+name: main
+on: push
+
 jobs:
-  github-actions:
+  main:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - name: Check out the main branch
+      uses: actions/checkout@v3
+      with:
+        ref: main
+
     - name: Run the workflow
       run: |
+        # Print shell commands as they execute
         set -x
+        
         # Run the script
-        npm install
-        npm start
+        node .
 ```
 
 ## Write Workflow
@@ -51,20 +53,24 @@ This workflow scripts executes a command and then commits its outputs to the
 repository associated with the workflow.
 
 ```yml
-name: github-actions
-on:
-  push:
-    branches:
-    # Limit to the `main` branch
-    - main
+name: main
+on: push
+
 jobs:
-  github-actions:
+  main:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - name: Check out the main branch
+      uses: actions/checkout@v3
+      with:
+        ref: main
+
     - name: Run the workflow
       run: |
+        # Fail on error
         set -e
+        
+        # Print shell commands as they execute
         set -x
         
         # Configure Git for the push from the workflow to the repository
@@ -72,17 +78,8 @@ jobs:
         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git config --global user.name "github-actions[bot]"
         
-        # Check out the `main` branch - GitHub Actions checks out detached HEAD
-        git checkout main
-        
-        # Run the CI script
-        ./script.sh
-        
-        # Authenticate with GitHub using the out-of-the-box workflow PAT
-        # This PAT won't build GitHub Pages when used!
-        # A custom PAT would build GitHub Pages but needs `[no ci]` to avoid infinite loop:
-        # https://github.blog/changelog/2021-02-08-github-actions-skip-pull-request-and-push-workflows-with-skip-ci
-        git remote set-url origin https://:${{github.token}}@github.com/${{github.repository}}
+        # Run the script
+        node .
         
         # Stage the Git index changes resulting from the CI script
         git add *
@@ -111,20 +108,23 @@ syntax and get the benefit of the nicer UI. I would only do this for simple
 scripts that are easy to convert back to Bash with just copy-paste if needed.
 
 ```yml
-name: github-actions
+name: main
 on:
   push:
   schedule:
     - cron: "0 0 * * *"
+
 jobs:
-  github-actions:
+  main:
     runs-on: ubuntu-latest
     steps:
       # We need to check out first so that we have a baseline to make a diff of
-      - name: Check out the existing scaffolded source code to make the change against
+      - name: Check out the main branch
         uses: actions/checkout@v3
+        with:
+          ref: main
 
-      # Set up Git baseline branch and identity before making any changes
+      # Set up Git identity before making any changes
       - name: Commit and push the change to the GitHub repository from the agent
         run: |
           # Configure Git for the push from the workflow to the repository
@@ -133,19 +133,9 @@ jobs:
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
 
-          # Check out the `main` branch - GitHub Actions checks out detached HEAD
-          git checkout main
-
       # Carry out the workflow work
       - name: Run the workflow script or do some other stuff in more steps
-        run: ./script.sh
-
-      # This PAT is provided by the GitHub Actions runtime and is good for
-      # everything but it will not cause GitHub Pages to deploy when pushed with
-      # Use a custom PAT in repository secrets and push with that one or call
-      # the GitHub Pages REST API to trigger a deployment manually
-      - name: Authenticate with GitHub using the out of the box PAT
-        run: git remote set-url origin https://:${{github.token}}@github.com/${{github.repository}}
+        run: node .
 
       - name: Stage the changes resulting from the above steps
         run: git add *
