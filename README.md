@@ -287,3 +287,9 @@ https://github.com/TomasHubelbauer/github-actions-push-api
 
 All of the new write workflows should be based on this and the old ones changed
 to this.
+
+### Validate whether the integration PAT token with Actions identity emits Pages
+
+I am not sure what change, but I think Pages either get deployed on commits from
+the workflow in general, or maybe only when using the integration PAT or maybe
+even when impersonating the Actions service account (with the integration PAT?).
